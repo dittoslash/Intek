@@ -31,8 +31,8 @@ var cD = function(systemSlotsItem) {
 
 var tick = function() {
 	$("#creditC").html(String(credits));
-	$("#fuelC").html(String(metal));
-	$("#crystalC").html(String(fuel));
+	$("#fuelC").html(String(fuel));
+	$("#crystalC").html(String(crystal));
 	$("#metalC").html(String(metal));
 	for (var i in slotHTMLs) {
 		$(slotHTMLs[i]).html(cD(systemSlots[i]))
@@ -55,6 +55,38 @@ var tick = function() {
 				break;
 		}
 	}
+	switch(enginestat) {
+		case 2:
+			$("#engine").attr("class", "tcc w3-green");
+			break;
+		case 1:
+			$("#engine").attr("class", "tcc w3-orange");
+			break;
+		case 0:
+			$("#engine").attr("class", "tcc w3-red");
+			break;
+		case -1:
+			$("#engine").attr("class", "tcc w3-black");
+			break;
+	}
+	switch(lifesupportstat) {
+		case 2:
+			$("#lifesupport").attr("class", "tcc w3-green");
+			break;
+		case 1:
+			$("#lifesupport").attr("class", "tcc w3-orange");
+			break;
+		case 0:
+			$("#lifesupport").attr("class", "tcc w3-red");
+			break;
+		case -1:
+			$("#lifesupport").attr("class", "tcc w3-black");
+			alert("You have died.")
+			mine = null;
+			travel = null;
+			break;
+	}
+	
 };
 var mine = function() {
 	var canMine = false
@@ -97,6 +129,27 @@ var mine = function() {
 		tick()
 	} else {
 		alert("Can't mine, no miner!")
+	}
+}
+var travel = function() {
+	var canTravel = false
+	for (var i in systemSlots) {
+		if (enginestat != -1 && fuel > 100) {
+			canTravel = true
+		}
+	}
+	if (canTravel) {
+		planetresources[0] = Math.floor((Math.random() * 2000) + 1)
+		planetresources[1] = Math.floor((Math.random() * 2000) + 1)
+		planetresources[2] = Math.floor((Math.random() * 2000) + 1)
+		fuel = fuel - 100
+		var rand = Math.floor((Math.random() * 20) + 1);
+		if (rand == 1) {
+			enginestat = enginestat - 1
+		}
+		tick()
+	} else {
+		alert("Not enough fuel (100 needed) or engine destroyed")
 	}
 }
 
