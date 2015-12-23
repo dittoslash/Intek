@@ -58,29 +58,37 @@ var tick = function() {
 	switch(enginestat) {
 		case 2:
 			$("#engine").attr("class", "tcc w3-green");
+            $("#engine").html("Engine")
 			break;
 		case 1:
 			$("#engine").attr("class", "tcc w3-orange");
+            $("#engine").html("Engine " + dam)
 			break;
 		case 0:
 			$("#engine").attr("class", "tcc w3-red");
+            $("#engine").html("Engine " + crit)
 			break;
 		case -1:
 			$("#engine").attr("class", "tcc w3-black");
+            $("#engine").html("Engine " + dest)
 			break;
 	}
 	switch(lifesupportstat) {
 		case 2:
 			$("#lifesupport").attr("class", "tcc w3-green");
+            $("#lifesupport").html("Life Support")
 			break;
 		case 1:
 			$("#lifesupport").attr("class", "tcc w3-orange");
+            $("#lifesupport").html("Life Support " + dam)
 			break;
 		case 0:
 			$("#lifesupport").attr("class", "tcc w3-red");
+            $("#lifesupport").html("Life Support " + crit);
 			break;
 		case -1:
 			$("#lifesupport").attr("class", "tcc w3-black");
+            $("#lifesupport").html("Life Support " + dest)
 			alert("You have died.")
 			mine = null;
 			travel = null;
@@ -124,7 +132,7 @@ var mine = function() {
 		}
 		rand = Math.floor((Math.random() * 6) + 1);
 		if (rand == 1) {
-			systemSlots[minerslot][1] = systemSlots[minerslot][1] - 1
+			systemSlots[minerslot][1]--;
 		}
 		tick()
 	} else {
@@ -134,8 +142,14 @@ var mine = function() {
 var travel = function() {
 	var canTravel = false
 	for (var i in systemSlots) {
-		if (enginestat != -1 && fuel > 100) {
+		if (enginestat != -1 && fuel >= 100) {
 			canTravel = true
+		}
+	}
+    var canGetRepairer = true
+    for (var i in systemSlots) {
+		if (systemSlots[i][0] == "Repairer" && systemSlots[i][1] != -1) {
+			canGetRepairer = false
 		}
 	}
 	if (canTravel) {
@@ -145,12 +159,67 @@ var travel = function() {
 		fuel = fuel - 100
 		var rand = Math.floor((Math.random() * 20) + 1);
 		if (rand == 1) {
-			enginestat = enginestat - 1
+			enginestat--;
 		}
+        rand = Math.floor((Math.random() * 8) + 1);
+        console.log(rand);
+        if (rand == 1 && canGetRepairer) {
+            console.log("boop");
+            var repairSlot = null;
+            for (var i in systemSlots) {
+                if (systemSlots[i][1] != -1) {
+                    repairSlot = i;
+                    break;
+                }
+            }
+            systemSlots[repairSlot] = ["Repairer", 2]
+        }
 		tick()
 	} else {
 		alert("Not enough fuel (100 needed) or engine destroyed")
 	}
 }
-
+var repair = function() {
+    var canrepair = false
+    for (var i in systemSlots) {
+		if (systemSlots[i][0] == "Repairer" && systemSlots[i][1] != -1) {
+			canrepair = true
+		}
+	}
+    if (canrepair) {
+    var system = prompt("System? (Repairs 1 point ) ls: Life Support(100metal/100crystal), eng: Engines(150metal/275crystal), A number: that slot (150metal/150crystal)")
+    switch(system) {
+        case "ls":
+            if (crystal >= 100 && metal >= 100 && lifesupportstat != 2) {
+                lifesupportstat++;
+            } else {
+                alert("Not enough resources or life support is green")
+            };
+            break;
+        case "eng":
+            if (crystal >= 150 && metal >= 275 && enginestat != 2) {
+                enginestat++;
+            } else {
+                alert("Not enough resources or life support is green")
+            };
+            break;
+        case "3":
+            if (crystal >= 150 && metal >= 150 && systemSlots[0][1] != 2) {
+                systemSlots[0][1]++;
+            } else {
+                alert("Not enough resources or life support is green")
+            };
+            break;
+        case "4":
+            if (crystal >= 150 && metal >= 150 && systemSlots[0][1] != 2) {
+                systemSlots[1][1]++;
+            } else {
+                alert("Not enough resources or life support is green")
+            };
+            break;
+            
+    }} else {
+        alert("No repairer")
+    }
+}
 tick()
